@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BluePrint Bio-Hub Omni v22.0</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --cyan: #00f2ff; --dark: #05070a; --card: #11151c; --border: #222; --text: #e1e1e1; --accent: #1a1e26; }
+        
+        * { box-sizing: border-box; scroll-behavior: smooth; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- AUTH --- */
+        #auth-screen { position: fixed; inset: 0; background: var(--dark); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .auth-card { border: 1px solid var(--cyan); padding: 40px; border-radius: 24px; text-align: center; background: var(--card); width: 90%; max-width: 420px; box-shadow: 0 0 60px rgba(0,242,255,0.15); }
+
+        /* --- NAVIGATION --- */
+        nav { width: 280px; background: #080a0f; border-right: 1px solid var(--border); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
+        .nav-header { font-family: 'Orbitron'; color: var(--cyan); font-size: 1.2rem; text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
+        .nav-group { font-size: 0.65rem; color: #444; text-transform: uppercase; margin: 20px 0 8px; font-weight: 800; letter-spacing: 1.5px; }
+        .nav-btn { padding: 12px; margin: 2px 0; cursor: pointer; border-radius: 10px; border: none; background: transparent; color: #888; text-align: left; transition: 0.2s; font-size: 0.85rem; }
+        .nav-btn:hover { color: var(--cyan); background: var(--accent); }
+        .nav-btn.active { background: var(--accent); color: var(--cyan); border-left: 4px solid var(--cyan); font-weight: 600; }
+
+        /* --- MAIN AREA --- */
+        main { flex: 1; padding: 30px; overflow-y: auto; background: radial-gradient(circle at top right, #121822, #05070a); }
+        .tab-content { display: none; max-width: 850px; margin: auto; animation: slideUp 0.4s ease-out; }
+        .tab-content.active { display: block; }
+
+        .module-card { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: 20px; margin-bottom: 25px; position: relative; }
+        h2 { font-family: 'Orbitron'; color: var(--cyan); font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 12px; }
+
+        .field-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        label { display: block; font-size: 0.65rem; color: #666; margin-bottom: 6px; font-weight: 800; text-transform: uppercase; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 12px; font-size: 0.95rem; }
+        textarea { height: 80px; resize: none; font-family: monospace; letter-spacing: 1px; }
+        
+        .btn-run { width: 100%; padding: 15px; background: transparent; border: 1px solid var(--cyan); color: var(--cyan); font-family: 'Orbitron'; cursor: pointer; border-radius: 12px; transition: 0.3s; font-size: 0.75rem; }
+        .btn-run:hover { background: var(--cyan); color: #000; box-shadow: 0 0 20px rgba(0,242,255,0.3); }
+
+        .res-box { margin-top: 20px; padding: 20px; background: #080a0f; border-radius: 12px; border-left: 5px solid var(--cyan); white-space: pre-line; font-size: 0.9rem; line-height: 1.6; display: none; }
+        .chart-box { height: 320px; margin-top: 25px; background: #000; border-radius: 20px; padding: 15px; }
+
+        #console { background: #000; padding: 15px; height: 110px; font-family: monospace; font-size: 0.75rem; color: #0f0; overflow-y: auto; border-radius: 12px; margin-top: 30px; border: 1px solid #222; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 850px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: 65px; flex-direction: row; order: 2; padding: 5px; overflow-x: auto; border-top: 1px solid var(--border); }
+            .nav-header, .nav-group { display: none; }
+            .nav-btn { white-space: nowrap; padding: 10px 20px; font-size: 0.75rem; }
+            main { order: 1; height: calc(100vh - 65px); padding: 20px; }
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div id="auth-screen">
+    <div class="auth-card">
+        <h1 style="font-family:'Orbitron'; color:var(--cyan); margin:0;">BIO-HUB</h1>
+        <p style="color:#555; font-size: 0.7rem; letter-spacing: 4px; margin-bottom: 35px;">OMNI-PROTOCOL v22.0</p>
+        <button class="btn-run" onclick="startApp()">INITIATE TERMINAL</button>
+    </div>
+</div>
+
+<nav>
+    <div class="nav-header">BIO-HUB</div>
+    
+    <div class="nav-group">Reagents & Prep</div>
+    <button class="nav-btn active" onclick="tab('prep')">🧪 Buffer & Molarity</button>
+    <button class="nav-btn" onclick="tab('dilute')">💧 Dilution (C1V1)</button>
+    
+    <div class="nav-group">Molecular Biology</div>
+    <button class="nav-btn" onclick="tab('pcr')">🧬 PCR & Tm Solver</button>
+    <button class="nav-btn" onclick="tab('seq')">🧩 DNA Translator</button>
+    
+    <div class="nav-group">Analysis</div>
+    <button class="nav-btn" onclick="tab('dna_qc')">🔬 Nucleic QC</button>
+    <button class="nav-btn" onclick="tab('kin')">📈 Enzyme Kinetics</button>
+    <button class="nav-btn" onclick="tab('cell')">🧫 Cell Counting</button>
+    
+    <button class="btn-run" onclick="pdf()" style="margin-top:25px; border-color:#444; color:#777;">📑 EXPORT REPORT</button>
+</nav>
+
+<main id="capture-area">
+    <div id="prep" class="tab-content active">
+        <div class="module-card">
+            <h2>Buffer Analyzer (H-H)</h2>
+            <div class="field-grid">
+                <div><label>pKa</label><input type="number" id="b_pka" value="7.2"></div>
+                <div><label>Target pH</label><input type="number" id="b_ph" value="7.4"></div>
+                <div><label>Total Conc (M)</label><input type="number" id="b_m" value="0.1"></div>
+            </div>
+            <button class="btn-run" onclick="runBuffer()">ANALYZE RATIOS</button>
+            <div id="res_buffer" class="res-box"></div>
+        </div>
+        <div class="module-card">
+            <h2>Molar Prep</h2>
+            <div class="field-grid">
+                <div><label>MW (g/mol)</label><input type="number" id="mw" value="180.16"></div>
+                <div><label>Molarity (M)</label><input type="number" id="mol" value="0.5"></div>
+                <div><label>Volume (L)</label><input type="number" id="vol" value="1"></div>
+            </div>
+            <button class="btn-run" onclick="runMolar()">CALC REQUIRED MASS</button>
+            <div id="res_molar" class="res-box"></div>
+        </div>
+    </div>
+
+    <div id="dilute" class="tab-content">
+        <div class="module-card">
+            <h2>Standard Dilution</h2>
+            <div class="field-grid">
+                <div><label>Stock (C1)</label><input type="number" id="c1" value="10"></div>
+                <div><label>Target (C2)</label><input type="number" id="c2" value="1"></div>
+                <div><label>Final Vol (V2)</label><input type="number" id="v2" value="100"></div>
+            </div>
+            <button class="btn-run" onclick="runDilution()">SOLVE FOR V1</button>
+            <div id="res_dilute" class="res-box"></div>
+        </div>
+    </div>
+
+    <div id="pcr" class="tab-content">
+        <div class="module-card">
+            <h2>Primer Melting Temp (Tm)</h2>
+            <div class="field-grid">
+                <div style="grid-column: span 2;"><label>Primer Sequence (5' -> 3')</label><input type="text" id="p_seq" placeholder="ATGC..."></div>
+            </div>
+            <button class="btn-run" onclick="runTm()">CALCULATE TM</button>
+            <div id="res_tm" class="res-box"></div>
+        </div>
+        <div class="module-card">
+            <h2>Primer Resuspension</h2>
+            <div class="field-grid">
+                <div><label>Amount (nmol)</label><input type="number" id="nmol" value="25.5"></div>
+                <div><label>Target Conc (µM)</label><input type="number" id="target_u" value="100"></div>
+            </div>
+            <button class="btn-run" onclick="runResus()">SOLVE VOL TO ADD</button>
+            <div id="res_resus" class="res-box"></div>
+        </div>
+    </div>
+
+    <div id="seq" class="tab-content">
+        <div class="module-card">
+            <h2>DNA to Protein Translator</h2>
+            <label>DNA Sequence</label>
+            <textarea id="dna_in" placeholder="ATG..."></textarea>
+            <button class="btn-run" style="margin-top:15px" onclick="runTrans()">GENERATE PROTEIN CHAIN</button>
+            <div id="res_seq" class="res-box"></div>
+        </div>
+    </div>
+
+    <div id="dna_qc" class="tab-content">
+        <div class="module-card">
+            <h2>A260/A280 Purity Scan</h2>
+            <div class="field-grid">
+                <div><label>A260 Abs</label><input type="number" id="a260" step="0.001"></div>
+                <div><label>A280 Abs</label><input type="number" id="a280" step="0.001"></div>
+            </div>
+            <button class="btn-run" onclick="runQC()">SCAN QUALITY</button>
+            <div id="res_qc" class="res-box"></div>
+        </div>
+    </div>
+
+    <div id="kin" class="tab-content">
+        <div class="module-card">
+            <h2>Enzyme Dynamics Plot</h2>
+            <div class="field-grid">
+                <div><label>Vmax</label><input type="number" id="vm" value="100"></div>
+                <div><label>Km</label><input type="number" id="km" value="15"></div>
+            </div>
+            <button class="btn-run" onclick="runKin()">UPDATE GRAPH</button>
+            <div class="chart-box"><canvas id="kinChart"></canvas></div>
+        </div>
+    </div>
+
+    <div id="cell" class="tab-content">
+        <div class="module-card">
+            <h2>Cell Density (Hemocytometer)</h2>
+            <div class="field-grid">
+                <div><label>Total Count</label><input type="number" id="c_sum" value="200"></div>
+                <div><label>Dilution Factor</label><input type="number" id="c_df" value="1"></div>
+            </div>
+            <button class="btn-run" onclick="runCell()">CALCULATE DENSITY</button>
+            <div id="res_cell" class="res-box"></div>
+        </div>
+    </div>
+
+    <div id="console">> Terminal Standby...</div>
+</main>
+
+<script>
+    let activeChart = null;
+
+    function startApp() {
+        document.getElementById('auth-screen').style.display = 'none';
+        log("System Initialized. Welcome Maryam.");
+    }
+
+    function log(m) {
+        const c = document.getElementById('console');
+        c.innerHTML += `<br>> [${new Date().toLocaleTimeString()}] ${m}`;
+        c.scrollTop = c.scrollHeight;
+    }
+
+    function tab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(id === 'kin') runKin();
+        log("Opened Module: " + id.toUpperCase());
+    }
+
+    function runBuffer() {
+        const pka = parseFloat(document.getElementById('b_pka').value);
+        const ph = parseFloat(document.getElementById('b_ph').value);
+        const m = parseFloat(document.getElementById('b_m').value);
+        const r = Math.pow(10, ph - pka);
+        const acid = m / (1 + r);
+        const salt = m - acid;
+        show('res_buffer', `Acid [HA]: ${acid.toFixed(4)} M\nSalt [A-]: ${salt.toFixed(4)} M\nRatio: ${r.toFixed(3)}`);
+    }
+
+    function runMolar() {
+        const res = document.getElementById('mw').value * document.getElementById('mol').value * document.getElementById('vol').value;
+        show('res_molar', `Required Mass: ${res.toFixed(3)} grams.`);
+    }
+
+    function runDilution() {
+        const v1 = (document.getElementById('c2').value * document.getElementById('v2').value) / document.getElementById('c1').value;
+        show('res_dilute', `Pipette V1: ${v1.toFixed(2)} units.\nFill to ${document.getElementById('v2').value} total volume.`);
+    }
+
+    function runTm() {
+        const s = document.getElementById('p_seq').value.toUpperCase().replace(/[^ATGC]/g, '');
+        if(!s) return;
+        const g = (s.match(/G/g) || []).length;
+        const c = (s.match(/C/g) || []).length;
+        const a = (s.match(/A/g) || []).length;
+        const t = (s.match(/T/g) || []).length;
+        let tm = (s.length < 14) ? (2*(a+t) + 4*(g+c)) : (64.9 + 41*(g+c-16.4)/(a+t+g+c));
+        show('res_tm', `Melting Temp: ${tm.toFixed(1)}°C\nGC Content: ${((g+c)/s.length*100).toFixed(1)}%`);
+    }
+
+    function runResus() {
+        const vol = (document.getElementById('nmol').value / document.getElementById('target_u').value) * 1000;
+        show('res_resus', `Add ${vol.toFixed(1)} µL of solvent.`);
+    }
+
+    function runTrans() {
+        const dna = document.getElementById('dna_in').value.toUpperCase().replace(/[^ATGC]/g, '');
+        const map = {"ATT":"I", "ATC":"I", "ATA":"I", "CTT":"L", "CTC":"L", "CTA":"L", "CTG":"L", "TTA":"L", "TTG":"L", "GTT":"V", "GTC":"V", "GTA":"V", "GTG":"V", "TTT":"F", "TTC":"F", "ATG":"M", "TGT":"C", "TGC":"C", "GCT":"A", "GCC":"A", "GCA":"A", "GCG":"A", "GGT":"G", "GGC":"G", "GGA":"G", "GGG":"G", "CCT":"P", "CCC":"P", "CCA":"P", "CCG":"P", "ACT":"T", "ACC":"T", "ACA":"T", "ACG":"T", "TCT":"S", "TCC":"S", "TCA":"S", "TCG":"S", "AGT":"S", "AGC":"S", "TAT":"Y", "TAC":"Y", "TGG":"W", "CAA":"Q", "CAG":"Q", "AAT":"N", "AAC":"N", "CAT":"H", "CAC":"H", "GAA":"E", "GAG":"E", "GAT":"D", "GAC":"D", "AAA":"K", "AAG":"K", "CGT":"R", "CGC":"R", "CGA":"R", "CGG":"R", "AGA":"R", "AGG":"R", "TAA":"[STOP]", "TAG":"[STOP]", "TGA":"[STOP]"};
+        let prot = "";
+        for(let i=0; i<dna.length-2; i+=3) prot += (map[dna.substring(i, i+3)] || "?") + "-";
+        show('res_seq', `Protein Chain:\n${prot.slice(0,-1)}`);
+    }
+
+    function runQC() {
+        const r = document.getElementById('a260').value / document.getElementById('a280').value;
+        show('res_qc', `260/280 Ratio: ${r.toFixed(2)}\nVerdict: ${r >= 1.8 ? 'PASS (Pure)' : 'FAIL (Contaminated)'}`);
+    }
+
+    function runCell() {
+        const d = (document.getElementById('c_sum').value/4) * 10000 * document.getElementById('c_df').value;
+        show('res_cell', `Density: ${d.toExponential(2)} cells/mL`);
+    }
+
+    function runKin() {
+        const vm = parseFloat(document.getElementById('vm').value);
+        const km = parseFloat(document.getElementById('km').value);
+        let x = [], y = [];
+        for(let s=0; s<=km*5; s+=km/5) { x.push(s.toFixed(1)); y.push((vm*s)/(km+s)); }
+        const ctx = document.getElementById('kinChart').getContext('2d');
+        if(activeChart) activeChart.destroy();
+        activeChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: x, datasets: [{ label: 'Rate', data: y, borderColor: '#00f2ff', fill: true, backgroundColor: 'rgba(0,242,255,0.05)', tension: 0.3 }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+        log("Kinetic Plot Synchronized.");
+    }
+
+    function show(id, msg) {
+        const e = document.getElementById(id);
+        e.style.display = 'block';
+        e.innerHTML = `<b>RESULT:</b>\n${msg}`;
+        log("Calc complete.");
+    }
+
+    function pdf() {
+        log("Compiling Diagnostic Report...");
+        html2pdf().from(document.getElementById('capture-area')).set({
+            margin: 0.5, filename: 'BioHub_Full_Report.pdf',
+            html2canvas: { backgroundColor: '#05070a', scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        }).save();
+    }
+</script>
+</body>
+</html>

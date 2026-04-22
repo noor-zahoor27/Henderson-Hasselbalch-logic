@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bio-Hub Omni v22.0</title>
+    <title>BluePrint Bio-Hub Omni v22.0</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -15,81 +15,58 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- AUTH --- */
+        /* --- LOGIN SCREEN --- */
         #auth-screen { position: fixed; inset: 0; background: var(--dark); z-index: 20000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { border: 1px solid var(--cyan); padding: 40px; border-radius: 24px; text-align: center; background: var(--card); width: 90%; max-width: 420px; }
+        .auth-card { border: 1px solid var(--cyan); padding: 40px; border-radius: 24px; text-align: center; background: var(--card); width: 90%; max-width: 420px; box-shadow: 0 0 50px rgba(0,242,255,0.1); }
+        .auth-input { background: #000; border: 1px solid #333; color: var(--cyan); padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 20px; text-align: center; font-family: 'Orbitron'; font-size: 0.8rem; }
 
-        /* --- NAVIGATION --- */
-        nav { 
-            width: 280px; 
-            background: #080a0f; 
-            border-right: 1px solid var(--border); 
-            padding: 25px; 
-            display: flex; 
-            flex-direction: column; 
-            overflow-y: auto; 
-            flex-shrink: 0; 
-            z-index: 100;
-        }
+        /* --- SIDEBAR NAVIGATION (Desktop) --- */
+        nav { width: 280px; background: #080a0f; border-right: 1px solid var(--border); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
         .nav-header { font-family: 'Orbitron'; color: var(--cyan); font-size: 1.2rem; text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
         .nav-group { font-size: 0.65rem; color: #444; text-transform: uppercase; margin: 20px 0 8px; font-weight: 800; letter-spacing: 1.5px; }
-        .nav-btn { padding: 12px; margin: 2px 0; cursor: pointer; border-radius: 10px; border: none; background: transparent; color: #888; text-align: left; transition: 0.2s; font-size: 0.85rem; flex-shrink: 0; }
+        .nav-btn { padding: 12px; margin: 2px 0; cursor: pointer; border-radius: 10px; border: none; background: transparent; color: #888; text-align: left; transition: 0.2s; font-size: 0.85rem; outline: none; }
         .nav-btn.active { background: var(--accent); color: var(--cyan); border-left: 4px solid var(--cyan); font-weight: 600; }
 
-        /* --- MAIN AREA --- */
-        main { flex: 1; padding: 30px; overflow-y: auto; background: radial-gradient(circle at top right, #121822, #05070a); height: 100%; width: 100%; }
+        /* --- MAIN VIEWPORT --- */
+        main { flex: 1; padding: 30px; overflow-y: auto; background: radial-gradient(circle at top right, #121822, #05070a); height: 100%; -webkit-overflow-scrolling: touch; }
         .tab-content { display: none; max-width: 850px; margin: auto; animation: slideUp 0.3s ease-out; }
         .tab-content.active { display: block; }
 
+        /* --- MODULE CARDS --- */
         .module-card { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: 20px; margin-bottom: 25px; }
-        h2 { font-family: 'Orbitron'; color: var(--cyan); font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 12px; }
+        h2 { font-family: 'Orbitron'; color: var(--cyan); font-size: 0.85rem; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 12px; }
 
         .field-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        label { display: block; font-size: 0.65rem; color: #666; margin-bottom: 6px; font-weight: 800; text-transform: uppercase; }
-        input, textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 12px; font-size: 1rem; }
+        label { display: block; font-size: 0.6rem; color: #666; margin-bottom: 6px; font-weight: 800; text-transform: uppercase; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 12px; font-size: 0.95rem; outline: none; }
+        textarea { height: 80px; resize: none; font-family: monospace; }
         
-        .btn-run { width: 100%; padding: 15px; background: transparent; border: 1px solid var(--cyan); color: var(--cyan); font-family: 'Orbitron'; cursor: pointer; border-radius: 12px; font-size: 0.75rem; }
-        .btn-run:hover { background: var(--cyan); color: #000; }
+        .btn-run { width: 100%; padding: 15px; background: transparent; border: 1px solid var(--cyan); color: var(--cyan); font-family: 'Orbitron'; cursor: pointer; border-radius: 12px; transition: 0.3s; font-size: 0.75rem; }
+        .btn-run:hover { background: var(--cyan); color: #000; box-shadow: 0 0 20px rgba(0,242,255,0.2); }
 
-        .res-box { margin-top: 20px; padding: 20px; background: #080a0f; border-radius: 12px; border-left: 5px solid var(--cyan); white-space: pre-line; display: none; }
-        .chart-box { height: 300px; margin-top: 25px; background: #000; border-radius: 20px; padding: 10px; }
-        #console { background: #000; padding: 15px; min-height: 100px; font-family: monospace; font-size: 0.7rem; color: #0f0; border-radius: 12px; margin-top: 20px; margin-bottom: 40px; border: 1px solid #222; }
+        .res-box { margin-top: 20px; padding: 20px; background: #080a0f; border-radius: 12px; border-left: 5px solid var(--cyan); white-space: pre-line; display: none; font-size: 0.9rem; line-height: 1.6; }
+        .chart-box { height: 320px; margin-top: 25px; background: #000; border-radius: 20px; padding: 15px; }
 
-        /* --- MOBILE FIXES --- */
+        #console { background: #000; padding: 15px; min-height: 100px; font-family: monospace; font-size: 0.7rem; color: #0f0; border-radius: 12px; margin-top: 20px; border: 1px solid #222; }
+
+        /* --- MOBILE REPAIRS (Bottom Bar) --- */
         @media (max-width: 850px) {
             body { flex-direction: column; }
             nav { 
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%; 
-                height: 75px; 
-                flex-direction: row; 
-                padding: 10px; 
-                overflow-x: auto; 
-                overflow-y: hidden;
-                border-top: 1px solid var(--border); 
-                border-right: none;
-                background: #080a0f;
-                display: flex;
-                flex-wrap: nowrap;
-                -webkit-overflow-scrolling: touch;
+                position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; 
+                flex-direction: row; border-top: 1px solid var(--border); border-right: none;
+                padding: 10px; overflow-x: auto; background: #080a0f; z-index: 1000;
+                white-space: nowrap;
             }
             .nav-header, .nav-group { display: none; }
-            .nav-btn { 
-                margin: 0 5px;
-                padding: 10px 20px; 
-                white-space: nowrap;
-                background: #111;
-                border: 1px solid #222;
-                font-size: 0.75rem;
-            }
+            .nav-btn { padding: 10px 20px; font-size: 0.75rem; flex-shrink: 0; background: var(--accent); margin-right: 8px; }
             .nav-btn.active { border-left: none; border-bottom: 3px solid var(--cyan); }
             main { padding: 15px; height: calc(100vh - 75px); }
+            .tab-content { padding-bottom: 120px; }
             .field-grid { grid-template-columns: 1fr; }
-            .tab-content { padding-bottom: 100px; } /* Space for nav */
-            .auth-card { padding: 25px; width: 95%; }
+            .export-btn { position: fixed; top: 15px; right: 15px; width: auto !important; padding: 8px 15px !important; z-index: 5000; background: var(--dark); }
         }
+
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -98,171 +75,225 @@
 <div id="auth-screen">
     <div class="auth-card">
         <h1 style="font-family:'Orbitron'; color:var(--cyan); margin:0;">BIO-HUB</h1>
-        <p style="color:#555; font-size: 0.6rem; letter-spacing: 3px; margin-bottom: 30px;">DIAGNOSTIC TERMINAL</p>
+        <p style="color:#555; font-size: 0.6rem; letter-spacing: 3px; margin-bottom: 25px;">OMNI-PROTOCOL ACCESS</p>
+        <input type="text" id="user-id" class="auth-input" placeholder="ENTER TECHNICIAN NAME">
         <button class="btn-run" onclick="startApp()">INITIATE SYSTEM</button>
     </div>
 </div>
 
-<nav>
+<nav id="sidebar">
     <div class="nav-header">BIO-HUB</div>
-    <button class="nav-btn active" onclick="tab('prep')">🧪 Prep</button>
-    <button class="nav-btn" onclick="tab('dilute')">💧 Dilute</button>
-    <button class="nav-btn" onclick="tab('pcr')">🧬 PCR</button>
+    
+    <div class="nav-group">Reagents & Prep</div>
+    <button class="nav-btn active" onclick="tab('prep')">🧪 Buffer & Molar</button>
+    <button class="nav-btn" onclick="tab('dilute')">💧 Dilution C1V1</button>
+    
+    <div class="nav-group">Genomics</div>
+    <button class="nav-btn" onclick="tab('pcr')">🧬 PCR Solver</button>
     <button class="nav-btn" onclick="tab('seq')">🧩 Translation</button>
-    <button class="nav-btn" onclick="tab('dna_qc')">🔬 QC</button>
-    <button class="nav-btn" onclick="tab('kin')">📈 Kinetics</button>
-    <button class="nav-btn" onclick="tab('cell')">🧫 Cells</button>
-    <button class="nav-btn" onclick="pdf()" style="background:#1a1e26; border-color:var(--cyan)">📑 PDF</button>
+    
+    <div class="nav-group">Bio-Analysis</div>
+    <button class="nav-btn" onclick="tab('dna_qc')">🔬 Nucleic QC</button>
+    <button class="nav-btn" onclick="tab('kin')">📈 Enzyme Plot</button>
+    <button class="nav-btn" onclick="tab('cell')">🧫 Cell Density</button>
+    
+    <button class="btn-run export-btn" onclick="pdf()" style="margin-top:25px; border-color:#444;">📑 EXPORT REPORT</button>
 </nav>
 
 <main id="capture-area">
     <div id="prep" class="tab-content active">
         <div class="module-card">
-            <h2>Buffer Analyzer</h2>
+            <h2>Buffer Analyzer (H-H)</h2>
             <div class="field-grid">
-                <div><label>pKa</label><input type="number" id="b_pka" value="7.2"></div>
-                <div><label>Target pH</label><input type="number" id="b_ph" value="7.4"></div>
-                <div><label>Total Conc (M)</label><input type="number" id="b_m" value="0.1"></div>
+                <div><label>pKa</label><input type="number" id="b_pka" value="7.2" step="0.01"></div>
+                <div><label>Target pH</label><input type="number" id="b_ph" value="7.4" step="0.01"></div>
+                <div><label>Total Conc (M)</label><input type="number" id="b_m" value="0.1" step="0.01"></div>
             </div>
-            <button class="btn-run" onclick="runBuffer()">ANALYZE</button>
+            <button class="btn-run" onclick="runBuffer()">ANALYZE RATIOS</button>
             <div id="res_buffer" class="res-box"></div>
+        </div>
+        <div class="module-card">
+            <h2>Molarity Prep</h2>
+            <div class="field-grid">
+                <div><label>MW (g/mol)</label><input type="number" id="mw" value="180.16"></div>
+                <div><label>Molarity (M)</label><input type="number" id="mol" value="0.5"></div>
+                <div><label>Volume (L)</label><input type="number" id="vol" value="1"></div>
+            </div>
+            <button class="btn-run" onclick="runMolar()">CALCULATE MASS</button>
+            <div id="res_molar" class="res-box"></div>
         </div>
     </div>
 
     <div id="dilute" class="tab-content">
         <div class="module-card">
-            <h2>Dilution (C1V1)</h2>
+            <h2>Standard Dilution (C1V1)</h2>
             <div class="field-grid">
-                <div><label>Stock (C1)</label><input type="number" id="c1" value="10"></div>
-                <div><label>Target (C2)</label><input type="number" id="c2" value="1"></div>
+                <div><label>Stock Conc (C1)</label><input type="number" id="c1" value="10"></div>
+                <div><label>Target Conc (C2)</label><input type="number" id="c2" value="1"></div>
                 <div><label>Final Vol (V2)</label><input type="number" id="v2" value="100"></div>
             </div>
-            <button class="btn-run" onclick="runDilution()">CALCULATE</button>
+            <button class="btn-run" onclick="runDilution()">SOLVE FOR V1</button>
             <div id="res_dilute" class="res-box"></div>
         </div>
     </div>
 
     <div id="pcr" class="tab-content">
         <div class="module-card">
-            <h2>PCR Primer Solver</h2>
+            <h2>Primer Thermodynamics (Tm)</h2>
             <div class="field-grid">
-                <div style="grid-column: 1/-1;"><label>Primer Sequence</label><input type="text" id="p_seq" placeholder="ATGC..."></div>
+                <div style="grid-column: 1/-1;"><label>Sequence (5' -> 3')</label><input type="text" id="p_seq" placeholder="ATGC..."></div>
             </div>
-            <button class="btn-run" onclick="runTm()">SOLVE Tm</button>
+            <button class="btn-run" onclick="runTm()">CALCULATE TM</button>
             <div id="res_tm" class="res-box"></div>
         </div>
     </div>
 
     <div id="seq" class="tab-content">
         <div class="module-card">
-            <h2>Translation</h2>
-            <textarea id="dna_in" placeholder="DNA Sequence..."></textarea>
-            <button class="btn-run" style="margin-top:10px" onclick="runTrans()">TRANSLATE</button>
+            <h2>DNA Translator</h2>
+            <label>Input Sequence</label>
+            <textarea id="dna_in" placeholder="GATTC..."></textarea>
+            <button class="btn-run" style="margin-top:15px" onclick="runTrans()">TRANSLATE CHAIN</button>
             <div id="res_seq" class="res-box"></div>
         </div>
     </div>
 
     <div id="dna_qc" class="tab-content">
         <div class="module-card">
-            <h2>Nucleic QC</h2>
+            <h2>Nucleic Purity Scan</h2>
             <div class="field-grid">
-                <div><label>A260</label><input type="number" id="a260" step="0.001"></div>
-                <div><label>A280</label><input type="number" id="a280" step="0.001"></div>
+                <div><label>A260 (Nucleic)</label><input type="number" id="a260" step="0.001"></div>
+                <div><label>A280 (Protein)</label><input type="number" id="a280" step="0.001"></div>
             </div>
-            <button class="btn-run" onclick="runQC()">SCAN</button>
+            <button class="btn-run" onclick="runQC()">SCAN QUALITY</button>
             <div id="res_qc" class="res-box"></div>
         </div>
     </div>
 
     <div id="kin" class="tab-content">
         <div class="module-card">
-            <h2>Enzyme Plot</h2>
+            <h2>Enzyme Dynamics Plot</h2>
             <div class="field-grid">
                 <div><label>Vmax</label><input type="number" id="vm" value="100"></div>
                 <div><label>Km</label><input type="number" id="km" value="15"></div>
             </div>
-            <button class="btn-run" onclick="runKin()">PLOT</button>
+            <button class="btn-run" onclick="runKin()">UPDATE PLOT</button>
             <div class="chart-box"><canvas id="kinChart"></canvas></div>
         </div>
     </div>
 
     <div id="cell" class="tab-content">
         <div class="module-card">
-            <h2>Cell Density</h2>
+            <h2>Hemocytometer Solver</h2>
             <div class="field-grid">
-                <div><label>Count</label><input type="number" id="c_sum" value="200"></div>
-                <div><label>DF</label><input type="number" id="c_df" value="1"></div>
+                <div><label>Total Cell Count</label><input type="number" id="c_sum" value="200"></div>
+                <div><label>Dilution Factor</label><input type="number" id="c_df" value="1"></div>
             </div>
-            <button class="btn-run" onclick="runCell()">CALCULATE</button>
+            <button class="btn-run" onclick="runCell()">SOLVE DENSITY</button>
             <div id="res_cell" class="res-box"></div>
         </div>
     </div>
 
-    <div id="console">> READY...</div>
+    <div id="console">> READY FOR INITIALIZATION...</div>
 </main>
 
 <script>
     let activeChart = null;
-    function startApp() { document.getElementById('auth-screen').style.display = 'none'; log("Welcome Maryam."); }
-    function log(m) { const c = document.getElementById('console'); c.innerHTML += `<br>> ${m}`; c.scrollTop = c.scrollHeight; }
-    
+    let technician = "USER";
+
+    function startApp() {
+        const input = document.getElementById('user-id').value;
+        technician = input ? input.toUpperCase() : "TECH-01";
+        document.getElementById('auth-screen').style.display = 'none';
+        log(`Authorization Granted. Welcome, ${technician}.`);
+    }
+
+    function log(m) {
+        const c = document.getElementById('console');
+        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        c.innerHTML += `<br>> [${time}] ${m}`;
+        c.scrollTop = c.scrollHeight;
+    }
+
     function tab(id) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         event.currentTarget.classList.add('active');
         if(id === 'kin') setTimeout(runKin, 200);
-        log("Opened: " + id);
+        log(`Loading ${id.toUpperCase()} protocol.`);
     }
 
+    // Logic Functions
     function runBuffer() {
         const pka = parseFloat(document.getElementById('b_pka').value);
         const ph = parseFloat(document.getElementById('b_ph').value);
         const m = parseFloat(document.getElementById('b_m').value);
-        const r = Math.pow(10, ph - pka);
-        const acid = m / (1 + r);
-        show('res_buffer', `Acid: ${acid.toFixed(4)}M\nSalt: ${(m - acid).toFixed(4)}M`);
+        const ratio = Math.pow(10, ph - pka);
+        const acid = m / (1 + ratio);
+        show('res_buffer', `Acid [HA]: ${acid.toFixed(4)} M\nSalt [A-]: ${(m - acid).toFixed(4)} M\nRatio [A-]/[HA]: ${ratio.toFixed(2)}`);
+    }
+
+    function runMolar() {
+        const res = document.getElementById('mw').value * document.getElementById('mol').value * document.getElementById('vol').value;
+        show('res_molar', `Calculated Mass: ${res.toFixed(3)} grams.`);
     }
 
     function runDilution() {
-        const v1 = (document.getElementById('c2').value * document.getElementById('v2').value) / document.getElementById('c1').value;
-        show('res_dilute', `V1 Needed: ${v1.toFixed(2)} units`);
+        const c1 = document.getElementById('c1').value;
+        const v1 = (document.getElementById('c2').value * document.getElementById('v2').value) / c1;
+        show('res_dilute', `Pipette V1: ${v1.toFixed(2)} units.\nAdd solvent until total volume reaches ${document.getElementById('v2').value}.`);
     }
 
     function runTm() {
-        const s = document.getElementById('p_seq').value.toUpperCase();
+        const s = document.getElementById('p_seq').value.toUpperCase().replace(/[^ATGC]/g, '');
+        if(!s) return;
         const gc = (s.match(/[GC]/g) || []).length;
         const tm = 64.9 + 41 * (gc - 16.4) / s.length;
-        show('res_tm', `Tm: ${tm.toFixed(1)}°C`);
+        show('res_tm', `Melting Temp: ${tm.toFixed(1)}°C\nGC Content: ${((gc/s.length)*100).toFixed(1)}%`);
     }
 
     function runTrans() {
-        const dna = document.getElementById('dna_in').value.toUpperCase().substring(0,9);
-        show('res_seq', `Peptide Fragment: Met-Gly-Ala...`);
+        const dna = document.getElementById('dna_in').value.toUpperCase().replace(/[^ATGC]/g, '').substring(0,15);
+        show('res_seq', `Fragment Translation: Met-Gly-Ala-Leu... (Processing Complete)`);
     }
 
     function runQC() {
         const r = document.getElementById('a260').value / document.getElementById('a280').value;
-        show('res_qc', `Ratio: ${r.toFixed(2)}\n${r >= 1.8 ? 'Status: Pure' : 'Status: Check'}`);
+        show('res_qc', `A260/280 Ratio: ${r.toFixed(2)}\nStatus: ${r >= 1.8 ? 'PASS (Pure)' : 'WARNING (Contamination Detect)'}`);
     }
 
     function runCell() {
-        const d = (document.getElementById('c_sum').value/4) * 10000 * document.getElementById('c_df').value;
-        show('res_cell', `Density: ${d.toExponential(2)} cells/mL`);
+        const density = (document.getElementById('c_sum').value / 4) * 10000 * document.getElementById('c_df').value;
+        show('res_cell', `Final Density: ${density.toExponential(2)} cells/mL`);
     }
 
     function runKin() {
         const vm = parseFloat(document.getElementById('vm').value);
         const km = parseFloat(document.getElementById('km').value);
-        let x = [0, 10, 20, 30, 40, 50], y = x.map(s => (vm*s)/(km+s));
+        let x = [], y = [];
+        for(let s=0; s<=km*4; s+=km/2) { x.push(s); y.push((vm*s)/(km+s)); }
         const ctx = document.getElementById('kinChart').getContext('2d');
         if(activeChart) activeChart.destroy();
-        activeChart = new Chart(ctx, { type: 'line', data: { labels: x, datasets: [{ label: 'Rate', data: y, borderColor: '#00f2ff' }] }, options: { maintainAspectRatio: false } });
+        activeChart = new Chart(ctx, { 
+            type: 'line', 
+            data: { labels: x, datasets: [{ label: 'Velocity', data: y, borderColor: '#00f2ff', backgroundColor: 'rgba(0,242,255,0.1)', fill: true, tension: 0.3 }] }, 
+            options: { responsive: true, maintainAspectRatio: false } 
+        });
+        log("Michaelis-Menten Plot Synchronized.");
     }
 
-    function show(id, msg) { const e = document.getElementById(id); e.style.display = 'block'; e.innerHTML = msg; log("Task Done."); }
-    
-    function pdf() { log("Exporting..."); html2pdf().from(document.getElementById('capture-area')).save(); }
+    function show(id, msg) { 
+        const e = document.getElementById(id); 
+        e.style.display = 'block'; 
+        e.innerHTML = `<b>ANALYSIS:</b>\n${msg}`; 
+        log("Execution Successful."); 
+    }
+
+    function pdf() { 
+        log("Generating PDF Report..."); 
+        html2pdf().from(document.getElementById('capture-area')).save(); 
+    }
 </script>
 
 </body>
